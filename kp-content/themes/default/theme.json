@@ -1,0 +1,10 @@
+{
+  "name": "Kivopress Default",
+  "description": "A polished, lightweight default theme for blogs, SaaS content, headless publishing, and Kivopress starter sites.",
+  "version": "1.1.0",
+  "author": "Kivopress",
+  "page_templates": {
+    "page-canvas": "Canvas",
+    "page-landing": "Landing Page"
+  }
+}

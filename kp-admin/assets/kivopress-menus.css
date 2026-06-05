@@ -1,0 +1,358 @@
+.kp-tabs {
+    border-bottom: 1px solid #c3c4c7;
+    display: flex;
+    gap: 4px;
+    margin: 0 0 24px;
+    padding-left: 6px;
+}
+
+.kp-tabs a {
+    background: #eef0f2;
+    border: 1px solid #c3c4c7;
+    border-bottom: 0;
+    color: #1d2327;
+    display: inline-flex;
+    font-weight: 700;
+    margin-bottom: -1px;
+    padding: 10px 14px;
+    text-decoration: none;
+}
+
+.kp-tabs a.is-active {
+    background: var(--kp-soft);
+    color: #000;
+}
+
+.kp-menu-selector,
+.kp-menu-select-form {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 12px;
+}
+
+.kp-menu-selector {
+    background: transparent;
+    border: 0;
+    justify-content: flex-start;
+    margin-top: -8px;
+    padding: 0;
+}
+
+.kp-menu-select-form label {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}
+
+.kp-menu-select-form select,
+.kp-menu-locations-table select {
+    min-width: 220px;
+}
+
+.kp-menu-create-link {
+    color: var(--kp-muted);
+}
+
+.kp-menu-workspace {
+    align-items: start;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.kp-menu-workspace h2 {
+    font-size: 18px;
+    margin: 0 0 12px;
+}
+
+.kp-menu-add-box {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-bottom: 0;
+}
+
+.kp-menu-add-box:last-child {
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.kp-menu-add-box summary {
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+    padding: 11px 14px;
+}
+
+.kp-menu-add-box summary::-webkit-details-marker {
+    display: none;
+}
+
+.kp-menu-add-box summary::after {
+    color: var(--kp-subtle);
+    content: "\25be";
+    float: right;
+}
+
+.kp-menu-add-box[open] summary::after {
+    content: "\25b4";
+}
+
+.kp-menu-add-box > div {
+    border-top: 1px solid var(--kp-line);
+    padding: 12px;
+}
+
+.kp-menu-add-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+}
+
+.kp-menu-add-tabs button {
+    background: #f6f7f7;
+    border: 1px solid var(--kp-line);
+    border-bottom: 0;
+    color: var(--kp-blue);
+    cursor: pointer;
+    font-size: 12px;
+    min-height: 30px;
+    padding: 6px 8px;
+}
+
+.kp-menu-add-tabs button.is-active {
+    background: #fff;
+    color: var(--kp-ink);
+    font-weight: 700;
+}
+
+.kp-menu-tab-panel[hidden] {
+    display: none;
+}
+
+.kp-menu-search {
+    border: 1px solid var(--kp-line);
+    margin: 0 0 8px;
+    min-height: 34px;
+    padding: 6px 8px;
+    width: 100%;
+}
+
+.kp-menu-choice-list {
+    border: 1px solid var(--kp-line);
+    display: grid;
+    gap: 7px;
+    max-height: 300px;
+    min-height: 96px;
+    overflow: auto;
+    padding: 10px;
+}
+
+.kp-menu-choice {
+    align-items: flex-start;
+    display: flex !important;
+    font-weight: 400 !important;
+    gap: 8px;
+    line-height: 1.35;
+}
+
+.kp-menu-choice input,
+.kp-menu-add-actions input,
+.kp-menu-settings input {
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+.kp-menu-field {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.kp-menu-add-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.kp-menu-structure-form {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    gap: 0;
+    padding: 0;
+}
+
+.kp-menu-name-row,
+.kp-menu-structure-form > p,
+.kp-menu-structure-form > h3,
+.kp-menu-settings,
+.kp-menu-bulk,
+.kp-menu-structure-list {
+    margin: 0;
+    padding: 12px;
+}
+
+.kp-menu-name-row,
+.kp-menu-savebar {
+    background: #fff;
+    border-bottom: 1px solid var(--kp-line);
+}
+
+.kp-menu-name-row label {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    max-width: 560px;
+}
+
+.kp-menu-name-row input {
+    max-width: 280px;
+}
+
+.kp-menu-bulk .kp-check,
+.kp-menu-settings .kp-check {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+}
+
+.kp-menu-structure-list {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+    max-width: 760px;
+}
+
+.kp-menu-item {
+    cursor: grab;
+    margin: 0 0 0 calc(var(--kp-menu-depth, 0) * 30px);
+    transition: margin-left .12s ease, opacity .12s ease;
+}
+
+.kp-menu-item.is-dragging {
+    opacity: .55;
+}
+
+.kp-menu-item details {
+    background: #f6f7f7;
+    border: 1px solid var(--kp-line);
+}
+
+.kp-menu-item summary {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    list-style: none;
+    min-height: 40px;
+    padding: 8px 12px;
+}
+
+.kp-menu-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.kp-menu-item-title {
+    align-items: baseline;
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+}
+
+.kp-menu-item-title strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kp-menu-item-title em {
+    color: var(--kp-muted);
+    font-size: 12px;
+    font-style: normal;
+}
+
+.kp-menu-item-actions {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 6px;
+}
+
+.kp-menu-item-actions button {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--kp-line);
+    color: var(--kp-muted);
+    cursor: pointer;
+    display: inline-flex;
+    height: 26px;
+    justify-content: center;
+    line-height: 1;
+    min-height: 0;
+    padding: 0;
+    width: 26px;
+}
+
+.kp-menu-item-actions button:hover {
+    border-color: var(--kp-blue);
+    color: var(--kp-blue);
+}
+
+.kp-menu-item-settings {
+    background: #fff;
+    border-top: 1px solid var(--kp-line);
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+}
+
+.kp-menu-item-grid,
+.kp-menu-settings {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.kp-menu-settings {
+    grid-template-columns: 140px minmax(0, 1fr);
+}
+
+.kp-menu-settings > div {
+    display: grid;
+    gap: 8px;
+}
+
+.kp-menu-savebar {
+    align-items: center;
+    border-bottom: 0;
+    border-top: 1px solid var(--kp-line);
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+}
+
+.kp-menu-locations-form {
+    max-width: 1040px;
+}
+
+.kp-menu-locations-table table {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+}
+
+@media (max-width: 900px) {
+    .kp-menu-workspace,
+    .kp-menu-item-grid,
+    .kp-menu-settings {
+        grid-template-columns: 1fr;
+    }
+
+    .kp-menu-item {
+        margin-left: calc(var(--kp-menu-depth, 0) * 18px);
+    }
+}

@@ -1,0 +1,47 @@
+# Local runtime configuration
+kp-content/config.php
+
+# Runtime data and generated content
+kp-content/cache/
+kp-content/data/
+kp-content/logs/
+kp-content/uploads/
+storage/
+
+# Database backups, dumps, and exports
+*-mysql-db-backup/
+mysql-db-backup/
+db-backups/
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.bak
+*.backup
+
+# Private management workspace
+kp-dev/
+AGENTS.md
+
+# Local/static site artifacts outside the Kivopress runtime
+kivopress-site/
+/assets/
+
+# Dependencies and build outputs
+node_modules/
+vendor/
+dist/
+build/
+coverage/
+
+# Environment files are not used by Kivopress runtime, but ignore accidental ones
+.env
+.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

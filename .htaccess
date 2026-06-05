@@ -1,0 +1,25 @@
+RewriteEngine On
+
+Options -Indexes
+
+# Preserve bearer tokens for REST clients behind Apache/FastCGI.
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Internal source, cache, logs, data, and local config must never be served.
+RewriteRule ^kp-includes(?:/|$) - [F,L,NC]
+RewriteRule ^kp-admin/(?!assets/)(?:.*)$ - [F,L,NC]
+RewriteRule ^kp-admin/assets/.*\.(?:php|phtml|phar|ini|env|md|json|lock)$ - [F,L,NC]
+RewriteRule ^kp-content/(?:cache|logs|data)(?:/|$) - [F,L,NC]
+RewriteRule ^kp-content/config\.php$ - [F,L,NC]
+
+# Protect root runtime/config files.
+RewriteRule ^(?:\.env|kp-load\.php|kp-config\.php|bootstrap\.php|config\.php|helpers\.php|package(?:-lock)?\.json)$ - [F,L,NC]
+
+# Themes/plugins may expose explicit assets, but never PHP, manifests, source,
+# dependency folders, or package metadata directly.
+RewriteRule ^kp-content/(?:plugins|themes)/[^/]+/(?:src|vendor|node_modules|tests?)(?:/|$) - [F,L,NC]
+RewriteRule ^kp-content/(?:plugins|themes)/.*\.(?:php|json|md|lock|env|ini|phar|phtml)$ - [F,L,NC]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
