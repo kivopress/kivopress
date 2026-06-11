@@ -124,6 +124,20 @@
     padding: 13px 15px;
 }
 
+.kp-install-help {
+    background: #f8faf8;
+    border: 1px solid var(--kp-line);
+    border-radius: 4px;
+    color: var(--kp-muted);
+    margin: 0;
+    padding: 9px 10px;
+}
+
+.kp-install-help code {
+    color: var(--kp-ink);
+    font-weight: 750;
+}
+
 .kp-nav-group {
     display: grid;
     position: relative;

@@ -24,21 +24,11 @@ final class Installer
 
     private function form(array $old = [], ?string $error = null): Response
     {
-        $old = array_merge([
-            'site_name' => 'Kivopress',
-            'driver' => 'mysql',
-            'host' => '127.0.0.1',
-            'port' => '3306',
-            'database' => 'kivopress',
-            'username' => 'root',
-            'charset' => 'utf8mb4',
-            'create_database' => '1',
-            'admin_name' => '',
-            'admin_email' => '',
-        ], $old);
+        $old = array_merge($this->formDefaults(), $old);
 
         $driver = (string) $old['driver'];
         $errorHtml = $error ? '<div class="notice error">' . \e($error) . '</div>' : '';
+        $databaseHelp = $this->databaseHelp();
 
         return $this->layout('Setup Kivopress', $errorHtml . '
             <form method="post" action="/setup">
@@ -64,6 +54,7 @@ final class Installer
                         <label>Port<input name="port" value="' . \e((string) $old['port']) . '"></label>
                         <label>Charset<input name="charset" value="' . \e((string) $old['charset']) . '"></label>
                     </div>
+                    ' . $databaseHelp . '
                     <label class="check"><input type="checkbox" name="create_database" value="1" ' . (!empty($old['create_database']) ? 'checked' : '') . '> Create the database if it does not exist</label>
                 </fieldset>
 
@@ -116,8 +107,69 @@ final class Installer
 
             return Response::redirect('/admin');
         } catch (\Throwable $exception) {
-            return $this->form($input, $exception->getMessage());
+            return $this->form($input, $this->friendlyInstallError($exception, $input));
         }
+    }
+
+    private function formDefaults(): array
+    {
+        $database = $this->config['database'] ?? [];
+        $account = $this->cpanelAccountName();
+        $isCpanel = $account !== null;
+        $configuredName = trim((string) ($database['name'] ?? 'kivopress'));
+        $configuredUser = trim((string) ($database['user'] ?? 'root'));
+        $configuredHost = trim((string) ($database['host'] ?? '127.0.0.1'));
+
+        return [
+            'site_name' => (string) ($this->config['name'] ?? 'Kivopress'),
+            'driver' => 'mysql',
+            'host' => $isCpanel && in_array($configuredHost, ['', '127.0.0.1'], true) ? 'localhost' : ($configuredHost ?: '127.0.0.1'),
+            'port' => trim((string) ($database['port'] ?? '3306')) ?: '3306',
+            'database' => $isCpanel && in_array($configuredName, ['', 'kivopress'], true) ? $account . '_kivopress' : ($configuredName ?: 'kivopress'),
+            'username' => $isCpanel && in_array($configuredUser, ['', 'root'], true) ? $account . '_kivopress' : ($configuredUser ?: 'root'),
+            'charset' => trim((string) ($database['charset'] ?? 'utf8mb4')) ?: 'utf8mb4',
+            'create_database' => $isCpanel ? '' : '1',
+            'admin_name' => '',
+            'admin_email' => '',
+        ];
+    }
+
+    private function databaseHelp(): string
+    {
+        $account = $this->cpanelAccountName();
+        $prefix = $account ? $account . '_' : 'account_';
+
+        return '<p class="kp-install-help">On cPanel, create the MySQL database and user in cPanel first, assign the user to the database, and enter the full prefixed names such as <code>' . \e($prefix) . 'kivopress</code>. The host is usually <code>localhost</code>; PHP cannot auto-detect the database password.</p>';
+    }
+
+    private function friendlyInstallError(\Throwable $exception, array $input): string
+    {
+        $message = $exception->getMessage();
+        $lower = strtolower($message);
+
+        if ($exception instanceof \PDOException || str_contains($lower, 'sqlstate')) {
+            if (str_contains($lower, 'access denied')) {
+                if (($input['username'] ?? '') === 'root' && ($input['password'] ?? '') === '') {
+                    return 'MySQL rejected root without a password. On cPanel, use the MySQL database user you created in cPanel, not root. The full username often looks like account_user.';
+                }
+
+                if (!empty($input['create_database'])) {
+                    return 'MySQL rejected the database operation. On cPanel, create the database in cPanel, assign the user to it, then retry with "Create the database" unchecked.';
+                }
+
+                return 'MySQL rejected those database credentials. Check the full cPanel database name, database username, password, and user privileges.';
+            }
+
+            if (str_contains($lower, 'unknown database')) {
+                return 'MySQL could not find that database. Create it in cPanel first, or enable database creation only when your MySQL user has CREATE DATABASE permission.';
+            }
+
+            if (str_contains($lower, 'connection refused') || str_contains($lower, 'getaddrinfo') || str_contains($lower, 'no such file or directory')) {
+                return 'Kivopress could not reach MySQL. On cPanel, the host is usually localhost and the port is usually 3306.';
+            }
+        }
+
+        return $message;
     }
 
     private function validate(array $input): void
@@ -152,7 +204,7 @@ final class Installer
                 'driver' => 'file',
                 'path' => $this->rootPath . '/kp-content/data/kivopress.sqlite',
                 'charset' => 'utf8mb4',
-                'prefix' => 'kp_',
+                'prefix' => (string) ($this->config['database']['prefix'] ?? 'kp_'),
             ];
         }
 
@@ -164,8 +216,55 @@ final class Installer
             'user' => trim((string) $input['username']),
             'password' => (string) ($input['password'] ?? ''),
             'charset' => trim((string) $input['charset']) ?: 'utf8mb4',
-            'prefix' => 'kp_',
+            'prefix' => (string) ($this->config['database']['prefix'] ?? 'kp_'),
         ];
+    }
+
+    private function cpanelAccountName(): ?string
+    {
+        foreach ($this->serverPaths() as $path) {
+            $path = str_replace('\\', '/', $path);
+
+            if (preg_match('#/(?:home|home\d+)/([^/]+)/(?:public_html|www)(?:/|$)#', $path, $match)) {
+                return $this->validAccountName($match[1]);
+            }
+        }
+
+        $cpanelUsername = getenv('CPANEL_USERNAME');
+
+        if (is_string($cpanelUsername) && ($account = $this->validAccountName($cpanelUsername))) {
+            return $account;
+        }
+
+        $serverSoftware = strtolower((string) ($_SERVER['SERVER_SOFTWARE'] ?? ''));
+
+        if (str_contains($serverSoftware, 'cpanel')) {
+            foreach (['USER', 'LOGNAME'] as $key) {
+                $value = getenv($key);
+
+                if (is_string($value) && ($account = $this->validAccountName($value))) {
+                    return $account;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function serverPaths(): array
+    {
+        return array_filter([
+            $this->rootPath,
+            $_SERVER['DOCUMENT_ROOT'] ?? null,
+            $_SERVER['SCRIPT_FILENAME'] ?? null,
+        ], 'is_string');
+    }
+
+    private function validAccountName(string $value): ?string
+    {
+        $value = trim($value);
+
+        return preg_match('/^[a-zA-Z][a-zA-Z0-9_]{1,31}$/', $value) ? $value : null;
     }
 
     private function prepareMysqlDatabase(array $databaseConfig, bool $createDatabase): void
